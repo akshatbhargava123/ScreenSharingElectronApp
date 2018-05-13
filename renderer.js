@@ -7,27 +7,38 @@ const fs = require('fs');
 
 let recorder, blobs = [];
 
+let sources;
+
+electron.desktopCapturer.getSources({ types: ['window', 'screen'] }, (error, sources) => {
+  if (error) throw error
+  console.log(sources);
+  let sourcesHTML = '';
+  sources.forEach(source => {
+    if (source.name != 'Entire screen')
+      sourcesHTML += `<option value="` + source.id + `">` + source.name + `</option>`;
+  });
+  document.getElementById('sources').innerHTML = sourcesHTML;
+});
+
+
 function startRecording() {
-  electron.desktopCapturer.getSources({ types: ['window', 'screen'] }, (error, sources) => {
-    if (error) throw error
-    for (let i = 0; i < sources.length; ++i) {
-      if (sources[i].name.indexOf('Visual Studio Code') > -1) {
-        console.log()
-        navigator.mediaDevices.getUserMedia({
-          audio: false,
-          video: {
-            mandatory: {
-              chromeMediaSource: 'desktop',
-              chromeMediaSourceId: sources[i].id
-            }
-          }
-        })
-          .then((stream) => handleStream(stream))
-          .catch((e) => handleUserMediaError(e))
-        return
+
+  let selectedSourceId = document.getElementById('sources').value;
+  console.log(selectedSourceId);
+
+  // console.log()
+  navigator.mediaDevices.getUserMedia({
+    audio: false,
+    video: {
+      mandatory: {
+        chromeMediaSource: 'desktop',
+        chromeMediaSourceId: selectedSourceId
       }
     }
   })
+    .then((stream) => handleStream(stream))
+    .catch((e) => handleUserMediaError(e))
+
 }
 
 function handleStream(stream) {
@@ -81,10 +92,10 @@ function toBuffer(ab) {
 }
 
 // Record for 7 seconds and save to disk
-startRecording();
+// startRecording();
 
 const toggleButton = document.getElementById('toggleState');
-toggleButton.onclick = function() {
+toggleButton.onclick = function () {
   if (toggleButton.innerText == 'Start') {
     startRecording();
   } else {

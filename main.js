@@ -15,7 +15,7 @@ require('electron-debug')({ showDevTools: true });
 
 function createWindow() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({ width: 800, height: 600, title: 'Hello World!' })
+  mainWindow = new BrowserWindow({ width: 500, height: 400, title: 'Hello World!' })
   mainWindow.maximize();
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
